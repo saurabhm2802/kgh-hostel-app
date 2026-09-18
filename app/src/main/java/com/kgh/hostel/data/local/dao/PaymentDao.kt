@@ -24,6 +24,9 @@ interface PaymentDao {
     @Query("SELECT * FROM payments WHERE status IN ('DUE','PARTIALLY_PAID','OVERDUE') ORDER BY month ASC")
     fun observeDue(): Flow<List<Payment>>
 
+    @Query("SELECT * FROM payments ORDER BY month DESC")
+    fun observeAll(): Flow<List<Payment>>
+
     @Query("SELECT COUNT(*) FROM payments WHERE status IN ('DUE','PARTIALLY_PAID','OVERDUE')")
     fun observeDueCount(): Flow<Int>
 
