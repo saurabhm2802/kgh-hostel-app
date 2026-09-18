@@ -98,8 +98,13 @@ fun AdmissionFormScreen(
                 modifier = Modifier.fillMaxWidth())
 
             Spacer(Modifier.height(4.dp))
-            Text("(Duration of hostel, Date of admission, DOB: use the date pickers — wired to a date-picker dialog component in the full build.)",
-                style = MaterialTheme.typography.bodySmall)
+            DateField("Date of Birth", state.dob) { millis -> viewModel.update { it.copy(dob = millis) } }
+            Spacer(Modifier.height(8.dp))
+            DateField("Duration From *", state.durationFrom) { millis -> viewModel.update { it.copy(durationFrom = millis) } }
+            Spacer(Modifier.height(8.dp))
+            DateField("Duration To *", state.durationTo) { millis -> viewModel.update { it.copy(durationTo = millis) } }
+            Spacer(Modifier.height(8.dp))
+            DateField("Date of Admission", state.admissionDate) { millis -> viewModel.update { it.copy(admissionDate = millis) } }
 
             Spacer(Modifier.height(16.dp))
             Text("Select Room *", style = MaterialTheme.typography.titleSmall)
@@ -155,3 +160,39 @@ fun AdmissionFormScreen(
 }
 
 private fun Modifier.horizontalScrollPadding() = this
+
+@Composable
+private fun DateField(
+    label: String,
+    selectedMillis: Long?,
+    onDateSelected: (Long) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    val displayText = selectedMillis?.let {
+        java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(java.util.Date(it))
+    } ?: "Tap to select date"
+
+    OutlinedButton(onClick = { showDialog = true }, modifier = Modifier.fillMaxWidth()) {
+        Text("$label: $displayText")
+    }
+
+    if (showDialog) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = selectedMillis ?: System.currentTimeMillis()
+        )
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { onDateSelected(it) }
+                    showDialog = false
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+}
