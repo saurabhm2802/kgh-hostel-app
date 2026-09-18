@@ -1,5 +1,6 @@
 package com.kgh.hostel.ui.reports
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,32 +10,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 private val REPORT_TYPES = listOf(
-    "Student Report",
-    "Room Occupancy Report",
-    "Vacant Bed Report",
-    "Attendance Report",
-    "Absent Student Report",
-    "Leave Report",
-    "Rent Due Report",
-    "Payment Report",
-    "Hostel Leaving Report"
+    "student" to "Student Report",
+    "room_occupancy" to "Room Occupancy Report",
+    "vacant_bed" to "Vacant Bed Report",
+    "attendance" to "Attendance Report",
+    "absent" to "Absent Student Report",
+    "leave" to "Leave Report",
+    "rent_due" to "Rent Due Report",
+    "payment" to "Payment Report",
+    "hostel_leaving" to "Hostel Leaving Report"
 )
 
-/**
- * Lists the report categories from the spec. Each report reads from the
- * relevant repository (already available via Hilt) and would render a
- * simple table plus a "Share as PDF/CSV" action using androidx.print /
- * a CSV writer — omitted here for brevity but straightforward to add per
- * report using the same repository Flows already built.
- */
 @Composable
 fun ReportsScreen(onReportClick: (String) -> Unit) {
     Scaffold(topBar = { TopAppBar(title = { Text("Reports") }) }) { padding ->
         LazyColumn(Modifier.padding(padding).padding(12.dp)) {
-            items(REPORT_TYPES) { report ->
+            items(REPORT_TYPES) { (slug, label) ->
                 ListItem(
-                    headlineContent = { Text(report) },
-                    modifier = Modifier
+                    headlineContent = { Text(label) },
+                    modifier = Modifier.clickable { onReportClick(slug) }
                 )
                 HorizontalDivider()
             }
