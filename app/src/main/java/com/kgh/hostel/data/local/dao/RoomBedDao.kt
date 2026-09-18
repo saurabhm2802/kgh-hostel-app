@@ -34,6 +34,9 @@ interface RoomBedDao {
     @Query("SELECT * FROM beds WHERE status = 'VACANT' ORDER BY roomId ASC")
     fun observeVacantBeds(): Flow<List<Bed>>
 
+    @Query("SELECT * FROM beds ORDER BY roomId ASC, bedNumber ASC")
+    fun observeAllBeds(): Flow<List<Bed>>
+
     @Query("SELECT COUNT(*) FROM beds")
     fun observeTotalBeds(): Flow<Int>
 
@@ -52,11 +55,6 @@ interface RoomBedDao {
     @Query("SELECT * FROM room_change_history WHERE studentId = :studentId ORDER BY changeDate DESC")
     fun observeHistoryForStudent(studentId: Long): Flow<List<RoomChangeHistory>>
 
-    /**
-     * Atomically moves a student into a new bed: frees the old bed (if any),
-     * occupies the new bed, and records history. Runs in a single transaction
-     * so a bed can never end up double-assigned.
-     */
     @Transaction
     suspend fun assignStudentToBed(
         studentId: Long,
