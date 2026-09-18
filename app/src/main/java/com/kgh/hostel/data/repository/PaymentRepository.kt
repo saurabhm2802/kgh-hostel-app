@@ -14,6 +14,7 @@ class PaymentRepository @Inject constructor(
 ) {
     fun observeForStudent(studentId: Long) = dao.observeForStudent(studentId)
     fun observeDue() = dao.observeDue()
+    fun observeAll() = dao.observeAll()
     fun observeDueCount() = dao.observeDueCount()
 
     suspend fun save(payment: Payment) {
