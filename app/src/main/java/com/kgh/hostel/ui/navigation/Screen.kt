@@ -31,6 +31,9 @@ sealed class Screen(val route: String) {
         fun createRoute(studentId: Long) = "payments/$studentId"
     }
     data object Reports : Screen("reports")
+    data object ReportDetail : Screen("report_detail/{reportType}") {
+        fun createRoute(reportType: String) = "report_detail/$reportType"
+    }
     data object Settings : Screen("settings")
     data object BackupRestore : Screen("backup_restore")
     data object ClearData : Screen("clear_data")
