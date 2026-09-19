@@ -24,6 +24,7 @@ import com.kgh.hostel.ui.leave.LeaveListScreen
 import com.kgh.hostel.ui.more.MoreScreen
 import com.kgh.hostel.ui.payments.PaymentScreen
 import com.kgh.hostel.ui.payments.RentDueScreen
+import com.kgh.hostel.ui.reports.ReportDetailScreen
 import com.kgh.hostel.ui.reports.ReportsScreen
 import com.kgh.hostel.ui.rooms.ChangeRoomScreen
 import com.kgh.hostel.ui.rooms.RoomListScreen
@@ -143,7 +144,17 @@ fun KGHNavHost() {
                 PaymentScreen(studentId = studentId)
             }
 
-            composable(Screen.Reports.route) { ReportsScreen(onReportClick = {}) }
+            composable(Screen.Reports.route) {
+                ReportsScreen(onReportClick = { slug -> navController.navigate(Screen.ReportDetail.createRoute(slug)) })
+            }
+
+            composable(
+                Screen.ReportDetail.route,
+                arguments = listOf(navArgument("reportType") { type = NavType.StringType })
+            ) { entry ->
+                val reportType = entry.arguments?.getString("reportType") ?: ""
+                ReportDetailScreen(reportType = reportType)
+            }
 
             composable(Screen.More.route) {
                 MoreScreen(
