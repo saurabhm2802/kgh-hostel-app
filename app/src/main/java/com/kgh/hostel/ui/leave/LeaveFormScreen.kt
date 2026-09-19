@@ -109,7 +109,9 @@ fun LeaveFormScreen(
             OutlinedTextField(state.guardianMobile, { v -> viewModel.update { it.copy(guardianMobile = v) } },
                 label = { Text("Mobile No. at that address") }, modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(8.dp))
-            Text("From date and To date: pick via date-picker dialog (wired in the full build).", style = MaterialTheme.typography.bodySmall)
+            DateField("From Date *", state.fromDate) { millis -> viewModel.update { it.copy(fromDate = millis) } }
+            Spacer(Modifier.height(8.dp))
+            DateField("To Date *", state.toDate) { millis -> viewModel.update { it.copy(toDate = millis) } }
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(state.parentRegisteredNumber, { v -> viewModel.update { it.copy(parentRegisteredNumber = v) } },
                 label = { Text("Parent's Registered Mobile (for confirmation call)") }, modifier = Modifier.fillMaxWidth())
@@ -129,6 +131,42 @@ fun LeaveFormScreen(
             Spacer(Modifier.height(8.dp))
             Text("The office-use section (call confirmation, Granted/Rejected, hostel in-charge) is completed from the Leave List screen once the administrator decides.",
                 style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
+private fun DateField(
+    label: String,
+    selectedMillis: Long?,
+    onDateSelected: (Long) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    val displayText = selectedMillis?.let {
+        java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(java.util.Date(it))
+    } ?: "Tap to select date"
+
+    OutlinedButton(onClick = { showDialog = true }, modifier = Modifier.fillMaxWidth()) {
+        Text("$label: $displayText")
+    }
+
+    if (showDialog) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = selectedMillis ?: System.currentTimeMillis()
+        )
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { onDateSelected(it) }
+                    showDialog = false
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 }
