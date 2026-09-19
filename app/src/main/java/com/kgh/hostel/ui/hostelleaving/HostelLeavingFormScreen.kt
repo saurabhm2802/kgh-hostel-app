@@ -116,6 +116,8 @@ fun HostelLeavingFormScreen(
             OutlinedTextField(state.durationStayed, { v -> viewModel.update { it.copy(durationStayed = v) } },
                 label = { Text("Duration stayed at hostel") }, modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(8.dp))
+            DateField("Leaving Date", state.leavingDate) { millis -> viewModel.update { it.copy(leavingDate = millis) } }
+            Spacer(Modifier.height(8.dp))
             OutlinedTextField(state.reasonForLeaving, { v -> viewModel.update { it.copy(reasonForLeaving = v) } },
                 label = { Text("Reason for Leaving Hostel *") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
             Spacer(Modifier.height(8.dp))
@@ -160,4 +162,40 @@ private fun RefundRow(label: String, value: String, onChange: (String) -> Unit) 
         modifier = Modifier.fillMaxWidth()
     )
     Spacer(Modifier.height(6.dp))
+}
+
+@Composable
+private fun DateField(
+    label: String,
+    selectedMillis: Long?,
+    onDateSelected: (Long) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    val displayText = selectedMillis?.let {
+        java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(java.util.Date(it))
+    } ?: "Tap to select date"
+
+    OutlinedButton(onClick = { showDialog = true }, modifier = Modifier.fillMaxWidth()) {
+        Text("$label: $displayText")
+    }
+
+    if (showDialog) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = selectedMillis ?: System.currentTimeMillis()
+        )
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { onDateSelected(it) }
+                    showDialog = false
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
 }
